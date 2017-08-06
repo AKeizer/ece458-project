@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
@@ -48,11 +49,30 @@ public class MainActivity extends AppCompatActivity {
         if (!keysDir.exists()) {
             keysDir.mkdir();
         }
+
         if (keysDir.list() == null) {
-            mAdapter = new FileDisplayAdapter(sample);
+            mAdapter = new FileDisplayAdapter(sample, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, SendKeyActivity.class);
+                    TextView tv = (TextView) view;
+                    String filename = tv.getText().toString();
+                    intent.putExtra("filename", filename);
+                    startActivity(intent);
+                }
+            });
 
         } else {
-            mAdapter = new FileDisplayAdapter(keysDir.list());
+            mAdapter = new FileDisplayAdapter(keysDir.list(), new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, SendKeyActivity.class);
+                    TextView tv = (TextView) view;
+                    String filename = tv.getText().toString();
+                    intent.putExtra("filename", filename);
+                    startActivity(intent);
+                }
+            });
         }
 
 

@@ -1,5 +1,6 @@
 package com.uwaterlooece458.projectece458;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
  */
 public class FileDisplayAdapter extends RecyclerView.Adapter<FileDisplayAdapter.ViewHolder> {
     private String[] mDataset;
+    private View.OnClickListener onItemClick;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -24,8 +26,9 @@ public class FileDisplayAdapter extends RecyclerView.Adapter<FileDisplayAdapter.
         }
     }
 
-    public FileDisplayAdapter(String[] myDataset) {
+    public FileDisplayAdapter(String[] myDataset, View.OnClickListener oc) {
         mDataset = myDataset;
+        onItemClick = oc;
     }
 
     @Override
@@ -37,6 +40,8 @@ public class FileDisplayAdapter extends RecyclerView.Adapter<FileDisplayAdapter.
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder((LinearLayout) v);
+
+        vh.mTitle.setOnClickListener(onItemClick);
         return vh;
     }
 
