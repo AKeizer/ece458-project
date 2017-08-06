@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
@@ -39,12 +42,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String[] sample = {"File1", "File2", "File3", "File4", "File5"};
+        String[] sample = {};
 
-        mAdapter = new FileDisplayAdapter(sample);
+        File keysDir = new File(getFilesDir(), "keys");
+        if (!keysDir.exists()) {
+            keysDir.mkdir();
+        }
+        if (keysDir.list() == null) {
+            mAdapter = new FileDisplayAdapter(sample);
+
+        } else {
+            mAdapter = new FileDisplayAdapter(keysDir.list());
+        }
+
+
         mRecyclerView.setAdapter(mAdapter);
 
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
