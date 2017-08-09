@@ -3,6 +3,7 @@ package com.uwaterlooece458.projectece458;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -19,8 +20,11 @@ public class SendKeyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_send_key);
         Intent intent = getIntent();
         String filename = intent.getExtras().getString("filename");
-        TextView title = (TextView) findViewById(R.id.send_title);
-        title.setText(filename);
+//        TextView title = (TextView) findViewById(R.id.send_title);
+//        title.setText(filename);
+        getSupportActionBar().setTitle(filename);
+//        getActionBar().setTitle(filename);
+
         File keysDir = new File(getFilesDir(), "keys");
         File keyFile = new File(keysDir, filename);
         ArrayList<Byte> byteList = new ArrayList<Byte>();

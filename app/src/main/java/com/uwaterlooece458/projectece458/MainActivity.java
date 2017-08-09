@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String[] sample = {};
+        String[] sample = {"Sample1", "Sample2", "Sample3"};
 
         File keysDir = new File(getFilesDir(), "keys");
         if (!keysDir.exists()) {

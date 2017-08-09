@@ -12,6 +12,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:textSize="18sp"
+        android:colorBackground="#dbdbdb"
+        style="@android:style/Theme.DeviceDefault.Light.Panel"
         android:layout_margin="8dp"/>
 
     <TextView
