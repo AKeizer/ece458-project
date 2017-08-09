@@ -33,16 +33,16 @@ public class ReceiveKeyActivity extends AppCompatActivity {
             }
         });
 
-        Button fakeSuccess = (Button) findViewById(R.id.fake_success);
-        fakeSuccess.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                saveIncomingKey("Saved File Name", "Key!");
-                Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
         new AcceptThread().start();
+//        Button fakeSuccess = (Button) findViewById(R.id.fake_success);
+//        fakeSuccess.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                saveIncomingKey("Saved File Name", "Key!");
+//                Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
     }
 
     private void saveIncomingKey(String filename, String contents) {
