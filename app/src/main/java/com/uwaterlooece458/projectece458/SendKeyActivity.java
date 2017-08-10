@@ -68,7 +68,7 @@ public class SendKeyActivity extends AppCompatActivity {
             public void onClick(View v) {
                 sendButton.setVisibility(View.GONE);
                 RelativeLayout spinner = (RelativeLayout) findViewById(R.id.sendingPanel);
-                spinner.setVisibility(View.VISIBLE);
+                spinner.setVisibility(View.VISIBLE  );
                 new AcceptThread(filename, bytes).start();
             }
         });
@@ -88,6 +88,7 @@ public class SendKeyActivity extends AppCompatActivity {
         private byte[] mmBuffer; // mmBuffer store for the stream
         private byte[] contents;
         private String filename;
+        private boolean performRun = true;
 
         public AcceptThread(String f, byte[] b) {
             // Use a temporary object that is later assigned to mmServerSocket
@@ -101,11 +102,25 @@ public class SendKeyActivity extends AppCompatActivity {
                 tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("AcceptKeys", MY_UUID);
             } catch (IOException e) {
                 Log.e("BLUETOOTHSECURITY", "Socket's listen() method failed", e);
+            } catch (NullPointerException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(SendKeyActivity.this, MainActivity.class);
+                        intent.putExtra("BLUETOOTHERROR", "No Bluetooth, please connect your device via bluetooth");
+                        startActivity(intent);
+                    }
+                });
+                performRun = false;
             }
             mmServerSocket = tmp;
         }
 
         public void run() {
+            if (!performRun) {
+                Log.i("BLUETOOTHERROR", "Abort run");
+                return;
+            }
             BluetoothSocket socket = null;
             OutputStream tmpOut = null;
             InputStream tmpIn = null;
@@ -174,13 +189,6 @@ public class SendKeyActivity extends AppCompatActivity {
         public void cancel() {
             try {
                 mmServerSocket.close();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(SendKeyActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    }
-                });
             } catch (IOException e) {
                 Log.e("BLUETOOTHSECURITY", "Could not close the connect socket", e);
             }

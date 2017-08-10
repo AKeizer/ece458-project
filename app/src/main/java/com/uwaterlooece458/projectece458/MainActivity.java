@@ -34,6 +34,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent starterIntent = getIntent();
+        if (starterIntent.hasExtra("BLUETOOTHERROR")) {
+            String msg = starterIntent.getExtras().getString("BLUETOOTHERROR");
+            View parentlayout = findViewById(R.id.mainContent);
+            Snackbar.make(parentlayout, msg, Snackbar.LENGTH_LONG).setAction("CLOSE", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            }).show();
+        }
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
