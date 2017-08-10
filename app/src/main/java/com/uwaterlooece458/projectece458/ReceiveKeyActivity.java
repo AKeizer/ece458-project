@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,9 +16,11 @@ import android.widget.Button;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ReceiveKeyActivity extends AppCompatActivity {
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private Handler mHandler;
     public static final java.util.UUID MY_UUID
             = java.util.UUID.fromString("B10E7007-CCD4-BBD7-1AAA-5EC000000017");
 
@@ -59,8 +63,19 @@ public class ReceiveKeyActivity extends AppCompatActivity {
         }
     }
 
+    private static int byteArrayToInt(byte[] b)
+    {
+        int value = 0;
+        for (int i = 0; i < 4; i++) {
+            int shift = (i) * 8;
+            value += (b[i] & 0x000000FF) << shift;
+        }
+        return value;
+    }
+
     private class AcceptThread extends Thread {
         private final BluetoothServerSocket mmServerSocket;
+        private byte[] mmBuffer; // mmBuffer store for the stream
 
         public AcceptThread() {
             // Use a temporary object that is later assigned to mmServerSocket
@@ -77,10 +92,12 @@ public class ReceiveKeyActivity extends AppCompatActivity {
 
         public void run() {
             BluetoothSocket socket = null;
+            InputStream tmpIn = null;
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
                     socket = mmServerSocket.accept();
+                    tmpIn = socket.getInputStream();
                 } catch (IOException e) {
                     Log.e("BLUETOOTHSECURITY", "Socket's accept() method failed", e);
                     break;
@@ -90,11 +107,47 @@ public class ReceiveKeyActivity extends AppCompatActivity {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
                     //manageMyConnectedSocket(socket);
+                    try{
+                        mmBuffer = new byte[4];
+                        tmpIn.read(mmBuffer);
+
+                        int numBytes = byteArrayToInt(mmBuffer);
+                        Log.i("BLUETOOTHSECURITY", "Byte array allocation successful");
+                        mmBuffer = new byte[numBytes];
+                        tmpIn.read(mmBuffer);
+                        String filename = new String(mmBuffer);
+                        mmBuffer = new byte[4];
+                        tmpIn.read(mmBuffer);
+                        numBytes = byteArrayToInt(mmBuffer);
+                        mmBuffer = new byte[numBytes];
+                        tmpIn.read(mmBuffer);
+                        String s = new String(mmBuffer);
+                        Log.i("BLUETOOTHSECURITY", filename);
+                        Log.i("BLUETOOTHSECURITY", s);
+                        saveIncomingKey(filename, s);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+//                        cancel();
+
+//                        Message readMsg = mHandler.obtainMessage(0, numBytes, -1, mmBuffer);
+//                        readMsg.sendToTarget();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     try {
+                        socket.close();
                         mmServerSocket.close();
+
                     } catch (IOException e) {
                         Log.e("BLUETOOTHSECURITY", "Socket's close() method failed", e);
                     }
+                    cancel();
                     break;
                 }
             }
@@ -102,11 +155,11 @@ public class ReceiveKeyActivity extends AppCompatActivity {
 
         // Closes the connect socket and causes the thread to finish.
         public void cancel() {
-            try {
-                mmServerSocket.close();
-            } catch (IOException e) {
-                Log.e("BLUETOOTHSECURITY", "Could not close the connect socket", e);
-            }
+//            try {
+////                mmServerSocket.close();
+//            } catch (IOException e) {
+//                Log.e("BLUETOOTHSECURITY", "Could not close the connect socket", e);
+//            }
         }
     }
 }

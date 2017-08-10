@@ -15,13 +15,13 @@
         <!--android:textSize="20sp"-->
         <!--android:layout_height="wrap_content" />-->
     <RelativeLayout
-        android:id="@+id/sendKeyButton"
+        android:id="@+id/send_key"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center" >
 
         <Button
-            android:id="@+id/send_key"
+            android:id="@+id/sendKeyButton"
             android:textColor="#FFFFFF"
             android:textSize="30sp"
             android:text="@string/send"
