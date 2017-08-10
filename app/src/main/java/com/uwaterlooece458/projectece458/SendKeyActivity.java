@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +39,7 @@ public class SendKeyActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(filename);
 //        getActionBar().setTitle(filename);
 
-        Button sendButton = (Button) findViewById(R.id.sendKeyButton);
+        final Button sendButton = (Button) findViewById(R.id.sendKeyButton);
 
 
         File keysDir = new File(getFilesDir(), "keys");
@@ -65,6 +66,9 @@ public class SendKeyActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sendButton.setVisibility(View.GONE);
+                RelativeLayout spinner = (RelativeLayout) findViewById(R.id.sendingPanel);
+                spinner.setVisibility(View.VISIBLE);
                 new AcceptThread(filename, bytes).start();
             }
         });
@@ -131,6 +135,10 @@ public class SendKeyActivity extends AppCompatActivity {
                         tmpOut.write(contents);
 
                         Log.i("BLUETOOTHSECURITY", filename);
+
+                        File keysDir = new File(getFilesDir(), "keys");
+                        File keyFile = new File(keysDir, filename);
+                        keyFile.delete();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
