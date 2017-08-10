@@ -1,5 +1,6 @@
 package com.uwaterlooece458.projectece458;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -57,10 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
         String[] sample = {};
 
-        File keysDir = new File(getFilesDir(), "keys");
-        if (!keysDir.exists()) {
-            keysDir.mkdir();
-        }
+//        File keysDir = new File(getFilesDir(), "keys");
+//        if (!keysDir.exists()) {
+//            keysDir.mkdir();
+//        }
+
+        File keysDir = getDir("keys", Context.MODE_PRIVATE);
 
         if (keysDir.list() == null) {
             mAdapter = new FileDisplayAdapter(sample, new View.OnClickListener() {

@@ -3,6 +3,7 @@ package com.uwaterlooece458.projectece458;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,7 +43,8 @@ public class SendKeyActivity extends AppCompatActivity {
         final Button sendButton = (Button) findViewById(R.id.sendKeyButton);
 
 
-        File keysDir = new File(getFilesDir(), "keys");
+//        File keysDir = new File(getFilesDir(), "keys");
+        File keysDir = getDir("keys", Context.MODE_PRIVATE);
         File keyFile = new File(keysDir, filename);
         ArrayList<Byte> byteList = new ArrayList<Byte>();
         final byte[] bytes;

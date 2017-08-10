@@ -50,8 +50,8 @@ public class ReceiveKeyActivity extends AppCompatActivity {
     }
 
     private void saveIncomingKey(String filename, String contents) {
-//        File file = new File(this.context.getFilesDir(), filename);
-        File keysDir = new File(getFilesDir(), "keys");
+//        File keysDir = new File(getFilesDir(), "keys");
+        File keysDir = getDir("keys", Context.MODE_PRIVATE);
         File keyFile = new File(keysDir, filename);
         try {
             keyFile.createNewFile();
