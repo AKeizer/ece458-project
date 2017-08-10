@@ -50,8 +50,7 @@ public class ReceiveKeyActivity extends AppCompatActivity {
     }
 
     private void saveIncomingKey(String filename, byte[] contents) {
-//        File file = new File(this.context.getFilesDir(), filename);
-        File keysDir = new File(getFilesDir(), "keys");
+        File keysDir = getDir("keys", Context.MODE_PRIVATE);
         File keyFile = new File(keysDir, filename);
         try {
             keyFile.createNewFile();
@@ -77,6 +76,7 @@ public class ReceiveKeyActivity extends AppCompatActivity {
     private class AcceptThread extends Thread {
         private final BluetoothServerSocket mmServerSocket;
         private byte[] mmBuffer; // mmBuffer store for the stream
+        private boolean performRun = true;
 
         public AcceptThread() {
             // Use a temporary object that is later assigned to mmServerSocket
@@ -87,11 +87,24 @@ public class ReceiveKeyActivity extends AppCompatActivity {
                 tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("AcceptKeys", MY_UUID);
             } catch (IOException e) {
                 Log.e("BLUETOOTHSECURITY", "Socket's listen() method failed", e);
+            } catch (NullPointerException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
+                        intent.putExtra("BLUETOOTHERROR", "No Bluetooth, please connect your device via bluetooth");
+                        startActivity(intent);
+                    }
+                });
+                performRun = false;
             }
             mmServerSocket = tmp;
         }
 
         public void run() {
+            if (!performRun) {
+                return;
+            }
             BluetoothSocket socket = null;
             InputStream tmpIn = null;
             // Keep listening until exception occurs or a socket is returned.
