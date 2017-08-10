@@ -14,23 +14,32 @@
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:text="Placeholder for File Saving tests" />-->
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/loadingPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center" >
 
         <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:indeterminate="true"
             android:indeterminateOnly="true"
-            android:minHeight="100dp"
-            android:minWidth="100dp"
+
+            android:gravity="center"
             android:indeterminateTint="@color/colorPrimary"
             android:indeterminateTintMode="multiply"/>
-    </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="50sp"
+            android:text="14" />
+    </FrameLayout>
 
     <Button
         android:id="@+id/cancel_get_key"
