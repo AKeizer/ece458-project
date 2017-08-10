@@ -1,5 +1,6 @@
 package com.uwaterlooece458.projectece458;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -34,6 +35,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent starterIntent = getIntent();
+        if (starterIntent.hasExtra("BLUETOOTHERROR")) {
+            String msg = starterIntent.getExtras().getString("BLUETOOTHERROR");
+            View parentlayout = findViewById(R.id.mainContent);
+            Snackbar.make(parentlayout, msg, Snackbar.LENGTH_LONG).setAction("CLOSE", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            }).show();
+        }
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,12 +56,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String[] sample = {"Sample1", "Sample2", "Sample3"};
+        String[] sample = {};
 
-        File keysDir = new File(getFilesDir(), "keys");
-        if (!keysDir.exists()) {
-            keysDir.mkdir();
-        }
+//        File keysDir = new File(getFilesDir(), "keys");
+//        if (!keysDir.exists()) {
+//            keysDir.mkdir();
+//        }
+
+        File keysDir = getDir("keys", Context.MODE_PRIVATE);
 
         if (keysDir.list() == null) {
             mAdapter = new FileDisplayAdapter(sample, new View.OnClickListener() {
