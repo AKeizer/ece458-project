@@ -11,8 +11,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -71,7 +74,7 @@ public class SendKeyActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendButton.setVisibility(View.GONE);
-                RelativeLayout spinner = (RelativeLayout) findViewById(R.id.sendingPanel);
+                FrameLayout spinner = (FrameLayout) findViewById(R.id.sendingPanel);
                 spinner.setVisibility(View.VISIBLE  );
                 new AcceptThread(filename, bytes).start();
             }
@@ -139,6 +142,15 @@ public class SendKeyActivity extends AppCompatActivity {
             } catch (Throwable e) {
                 Log.e("BLUETOOTHSECURITY", "reflection fail", e);
             }
+
+            final int finalPort = port;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView portDisplay = (TextView) findViewById(R.id.portNumSend);
+                    portDisplay.setText(String.valueOf(finalPort));
+                }
+            });
             Log.i("BLUETOOTHSECURITY", String.valueOf(port));
             while (true) {
                 try {
@@ -175,6 +187,7 @@ public class SendKeyActivity extends AppCompatActivity {
                     }
 
                     try {
+//                        socket.close();
                         mmServerSocket.close();
                         runOnUiThread(new Runnable() {
                             @Override

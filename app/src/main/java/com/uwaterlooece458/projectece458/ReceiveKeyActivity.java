@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,12 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.channels.ClosedByInterruptException;
 
 public class ReceiveKeyActivity extends AppCompatActivity {
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    BluetoothServerSocket tmp = null;
     private Handler mHandler;
     public static final java.util.UUID MY_UUID
             = java.util.UUID.fromString("B10E7007-CCD4-BBD7-1AAA-5EC000000017");
+    private AcceptThread bluetoothThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +43,31 @@ public class ReceiveKeyActivity extends AppCompatActivity {
             }
         });
 
-        new AcceptThread().start();
+
+        boolean performRun = true;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("AcceptKeys", MY_UUID);
+        } catch (IOException e) {
+            Log.e("BLUETOOTHSECURITY", "Socket's listen() method failed", e);
+        } catch (NullPointerException e) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
+                    intent.putExtra("BLUETOOTHERROR", "No Bluetooth, please connect your device via bluetooth");
+                    startActivity(intent);
+                }
+            });
+            performRun = false;
+        }
+        if (!performRun) {
+            Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
+            intent.putExtra("BLUETOOTHERROR", "No Bluetooth, please connect your device via bluetooth");
+            startActivity(intent);
+        }
+        bluetoothThread = new AcceptThread(tmp);
+        bluetoothThread.start();
 //        Button fakeSuccess = (Button) findViewById(R.id.fake_success);
 //        fakeSuccess.setOnClickListener(new View.OnClickListener() {
 //            public void onClick(View v) {
@@ -49,6 +77,17 @@ public class ReceiveKeyActivity extends AppCompatActivity {
 //            }
 //        });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("BLUETOOTHONDESTROY", "SENDING INTERRUPT");
+        try {
+            tmp.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveIncomingKey(String filename, byte[] contents) {
@@ -80,26 +119,10 @@ public class ReceiveKeyActivity extends AppCompatActivity {
         private byte[] mmBuffer; // mmBuffer store for the stream
         private boolean performRun = true;
 
-        public AcceptThread() {
+        public AcceptThread(BluetoothServerSocket tmp) {
             // Use a temporary object that is later assigned to mmServerSocket
             // because mmServerSocket is final.
-            BluetoothServerSocket tmp = null;
-            try {
-                // MY_UUID is the app's UUID string, also used by the client code.
-                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("AcceptKeys", MY_UUID);
-            } catch (IOException e) {
-                Log.e("BLUETOOTHSECURITY", "Socket's listen() method failed", e);
-            } catch (NullPointerException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(ReceiveKeyActivity.this, MainActivity.class);
-                        intent.putExtra("BLUETOOTHERROR", "No Bluetooth, please connect your device via bluetooth");
-                        startActivity(intent);
-                    }
-                });
-                performRun = false;
-            }
+
             mmServerSocket = tmp;
         }
 
@@ -121,12 +144,30 @@ public class ReceiveKeyActivity extends AppCompatActivity {
             } catch (Throwable e) {
                 Log.e("BLUETOOTHSECURITY", "reflection fail", e);
             }
+            final int finalPort = port;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView portDisplay = (TextView) findViewById(R.id.portNumReceive);
+                    portDisplay.setText(String.valueOf(finalPort));
+                }
+            });
             Log.i("BLUETOOTHSECURITY", String.valueOf(port));
             while (true) {
                 try {
                     socket = mmServerSocket.accept();
                     tmpIn = socket.getInputStream();
-                } catch (IOException e) {
+                } catch (ClosedByInterruptException e) {
+                    Log.i("BLUETOOTHCLOSING","Intterupted and closing");
+                    try {
+                        mmServerSocket.close();
+                        return;
+                    } catch (IOException ioe) {
+                        e.printStackTrace();
+                    }
+
+                }
+                catch (IOException e) {
                     Log.e("BLUETOOTHSECURITY", "Socket's accept() method failed", e);
                     break;
                 }

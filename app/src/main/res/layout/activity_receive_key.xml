@@ -34,6 +34,7 @@
             android:indeterminateTint="@color/colorPrimary"
             android:indeterminateTintMode="multiply"/>
         <TextView
+            android:id="@+id/portNumReceive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
