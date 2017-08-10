@@ -49,14 +49,15 @@ public class ReceiveKeyActivity extends AppCompatActivity {
 
     }
 
-    private void saveIncomingKey(String filename, String contents) {
+    private void saveIncomingKey(String filename, byte[] contents) {
 //        File file = new File(this.context.getFilesDir(), filename);
         File keysDir = new File(getFilesDir(), "keys");
         File keyFile = new File(keysDir, filename);
         try {
             keyFile.createNewFile();
             FileOutputStream outputStream = new FileOutputStream(keyFile);
-            outputStream.write(contents.getBytes());
+            outputStream.write(contents, 0 , contents.length);
+            outputStream.flush();
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,19 +113,17 @@ public class ReceiveKeyActivity extends AppCompatActivity {
                         tmpIn.read(mmBuffer);
 
                         int numBytes = byteArrayToInt(mmBuffer);
-                        Log.i("BLUETOOTHSECURITY", "Byte array allocation successful");
+                        Log.i("BLUETOOTHSECURITY", "Byte array allocation successful " + String.valueOf(numBytes));
                         mmBuffer = new byte[numBytes];
                         tmpIn.read(mmBuffer);
                         String filename = new String(mmBuffer);
                         mmBuffer = new byte[4];
                         tmpIn.read(mmBuffer);
                         numBytes = byteArrayToInt(mmBuffer);
+                        Log.i("BLUETOOTHSECURITY", "Key size " + String.valueOf(numBytes));
                         mmBuffer = new byte[numBytes];
                         tmpIn.read(mmBuffer);
-                        String s = new String(mmBuffer);
-                        Log.i("BLUETOOTHSECURITY", filename);
-                        Log.i("BLUETOOTHSECURITY", s);
-                        saveIncomingKey(filename, s);
+                        saveIncomingKey(filename, mmBuffer);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

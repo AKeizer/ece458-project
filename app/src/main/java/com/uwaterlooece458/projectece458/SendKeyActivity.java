@@ -104,13 +104,11 @@ public class SendKeyActivity extends AppCompatActivity {
         public void run() {
             BluetoothSocket socket = null;
             OutputStream tmpOut = null;
-            InputStream tmpIn = null;
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
                     socket = mmServerSocket.accept();
                     tmpOut = socket.getOutputStream();
-                    tmpIn = socket.getInputStream();
                 } catch (IOException e) {
                     Log.e("BLUETOOTHSECURITY", "Socket's accept() method failed", e);
                     break;
@@ -119,7 +117,6 @@ public class SendKeyActivity extends AppCompatActivity {
                 if (socket != null) {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
-                    //manageMyConnectedSocket(socket);
                     try{
                         mmBuffer = intToByteArray(filename.length());
                         tmpOut.write(mmBuffer);
@@ -128,19 +125,12 @@ public class SendKeyActivity extends AppCompatActivity {
                         tmpOut.write(mmBuffer);
 
                         mmBuffer = intToByteArray(contents.length);
+                        Log.i("BLUETOOTHSECURITY", "pad len " + String.valueOf(contents.length));
                         tmpOut.write(mmBuffer);
 
                         tmpOut.write(contents);
 
                         Log.i("BLUETOOTHSECURITY", filename);
-//                        Log.i("BLUETOOTHSECURITY", s);
-//                        mmBuffer = new byte[4];
-//                        tmpIn.read(mmBuffer);
-//                        Log.i("BLUETOOTHSECURITY", filename);
-//                        cancel();
-
-//                        Message readMsg = mHandler.obtainMessage(0, numBytes, -1, mmBuffer);
-//                        readMsg.sendToTarget();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
