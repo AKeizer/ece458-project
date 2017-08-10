@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class SendKeyActivity extends AppCompatActivity {
@@ -126,6 +128,18 @@ public class SendKeyActivity extends AppCompatActivity {
             BluetoothSocket socket = null;
             OutputStream tmpOut = null;
             // Keep listening until exception occurs or a socket is returned.
+            int port = 0;
+            try {
+                Field field = mmServerSocket.getClass().getDeclaredField("mSocket");
+                field.setAccessible(true);
+                BluetoothSocket hiddensocket = (BluetoothSocket) field.get(mmServerSocket);
+                Method method = hiddensocket.getClass().getDeclaredMethod("getPort");
+                method.setAccessible(true);
+                port = (int) method.invoke(hiddensocket);
+            } catch (Throwable e) {
+                Log.e("BLUETOOTHSECURITY", "reflection fail", e);
+            }
+            Log.i("BLUETOOTHSECURITY", String.valueOf(port));
             while (true) {
                 try {
                     socket = mmServerSocket.accept();

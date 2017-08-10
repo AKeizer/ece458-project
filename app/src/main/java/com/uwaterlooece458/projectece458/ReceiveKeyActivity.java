@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ReceiveKeyActivity extends AppCompatActivity {
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -108,6 +110,18 @@ public class ReceiveKeyActivity extends AppCompatActivity {
             BluetoothSocket socket = null;
             InputStream tmpIn = null;
             // Keep listening until exception occurs or a socket is returned.
+            int port = 0;
+            try {
+                Field field = mmServerSocket.getClass().getDeclaredField("mSocket");
+                field.setAccessible(true);
+                BluetoothSocket hiddensocket = (BluetoothSocket) field.get(mmServerSocket);
+                Method method = hiddensocket.getClass().getDeclaredMethod("getPort");
+                method.setAccessible(true);
+                port = (int) method.invoke(hiddensocket);
+            } catch (Throwable e) {
+                Log.e("BLUETOOTHSECURITY", "reflection fail", e);
+            }
+            Log.i("BLUETOOTHSECURITY", String.valueOf(port));
             while (true) {
                 try {
                     socket = mmServerSocket.accept();
